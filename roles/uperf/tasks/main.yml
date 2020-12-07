@@ -8,6 +8,14 @@
     namespace: '{{ operator_namespace }}'
   register: resource_state
 
+- name: Print Worker Nodes
+  k8s_info:
+    kind: Node
+    register: node_list
+
+- debug:
+    var: node_list
+
 - operator_sdk.util.k8s_status:
     api_version: ripsaw.cloudbulldozer.io/v1alpha1
     kind: Benchmark
