@@ -40,11 +40,11 @@
     var: bo
 
 - name: Print Worker Nodes
-  k8s_facts:
+  k8s_info:
     kind: Node
     api_version: v1
     namespace: '{{ operator_namespace }}'
-    register: node_list
+  register: node_list
 
 - debug:
     var: node_list
