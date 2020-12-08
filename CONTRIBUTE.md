@@ -133,7 +133,7 @@ The container is built using the [Operator SDK](https://github.com/operator-fram
 The public repository could be [quay](https://quay.io) in which case you'll need to:
 
 ```bash
-$ operator-sdk build quay.io/<username>/benchmark-operator:testing --image-builder podman 
+$ operator-sdk build quay.io/<username>/benchmark-operator --image-builder podman
 $ podman push quay.io/<username>/benchmark-operator:testing
 ```
 
