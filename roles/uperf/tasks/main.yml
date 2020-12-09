@@ -40,7 +40,8 @@
     var: bo
 
 - name: Print Worker Nodes
-  k8s_info:
+  k8s_facts:
+  #k8s_info:
     kind: Node
     api_version: v1
   register: node_list
