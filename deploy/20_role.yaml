@@ -5,7 +5,7 @@ metadata:
   name: benchmark-operator
 rules:
 - apiGroups:
-  - ""
+  - "*"
   resources:
   - pods
   - nodes
