@@ -1,9 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   creationTimestamp: null
   name: benchmark-operator
-  namespace: my-ripsaw
 rules:
 - apiGroups:
   - ""
