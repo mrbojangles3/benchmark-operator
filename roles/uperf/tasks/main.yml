@@ -43,7 +43,7 @@
   register: node_list
 
 - name: List debug
-  debug: msg="{{ nodelist.json | json_query(query) }}"
+  debug: msg="{{ node_list.json | json_query(query) }}"
   vars:
     query: "resources.metadata.name[*]"
 
