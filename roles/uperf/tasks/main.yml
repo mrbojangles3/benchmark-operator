@@ -36,18 +36,16 @@
       - name = benchmark-operator
   register: bo
 
-- debug:
-    var: bo
-
 - name: Print Worker Nodes
-  k8s_facts:
-  #k8s_info:
+  k8s_info:
     kind: Node
     api_version: v1
   register: node_list
 
-- debug:
-    var: node_list
+- name: List debug
+  debug: msg="{{ nodelist.json | json_query(query) }}"
+  vars:
+    query: "resources.metadata.name[*]"
 
 - name: Capture ServiceIP
   k8s_facts:
