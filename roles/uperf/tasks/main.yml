@@ -42,20 +42,17 @@
     api_version: v1
   register: node_list
 
-- name: Node list debug
-  loop: "{{ query('dict',node_list) }}"
-  when: "'resources' == item.key"
-  register: resource_dict
-
-- name: Node list debug2
-  loop: "{{ query('dict',resource_dict) }}"
-  when: "'metadata' == item.key"
-  register: metadata_dict
-
-- name: Node list debug3
+- name: Node_list print keys
   debug:
-    msg: "{{ item.name }} is {{ item.value}}"
-  loop: "{{ query('dict',metadata_dict) }}"
+    msg: " key: {{ item.key }} "
+  with_dict: "{{ node_list }}"
+
+- name: Node list debug ver2
+  debug:
+    msg: "{{ item.resources['metadata'] }}"
+  with_dict: "{{ node_list }}"
+  when: " 'resources' in item.key"
+
 
 - name: Capture ServiceIP
   k8s_facts:
