@@ -42,10 +42,10 @@
     api_version: v1
   register: node_list
 
-- name: List debug
-  debug: msg="{{ node_list.json | json_query(query) }}"
-  vars:
-    query: "resources.metadata.name[*]"
+- name: Node list debug
+  debug:
+    msg: "{{ item.key }} is {{ item.value.resources.metadata.name }}
+  loop:"{{ lookup('dict'), node_list }}"
 
 - name: Capture ServiceIP
   k8s_facts:
