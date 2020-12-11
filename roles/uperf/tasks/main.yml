@@ -44,8 +44,7 @@
 
 - name: Node list debug
   debug:
-    msg: "{{ item.key }} is {{ item.value.resources.metadata.name }}"
-  loop: "{{ lookup('dict'), node_list }}"
+    msg: "{{ query('node_list',resources.metadata.name[*]) }}"
 
 - name: Capture ServiceIP
   k8s_facts:
