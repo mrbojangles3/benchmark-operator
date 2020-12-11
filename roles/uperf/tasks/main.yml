@@ -43,8 +43,19 @@
   register: node_list
 
 - name: Node list debug
+  loop: "{{ query('dict',node_list) }}"
+  when: "'resources' == item.key"
+  register: resource_dict
+
+- name: Node list debug2
+  loop: "{{ query('dict',resource_dict) }}"
+  when: "'metadata' == item.key"
+  register: metadata_dict
+
+- name: Node list debug3
   debug:
-    msg: "{{ query('node_list',resources.metadata.name[*]) }}"
+    msg: "{{ item.name }} is {{ item.value}}"
+  loop: "{{ query('dict',metadata_dict) }}"
 
 - name: Capture ServiceIP
   k8s_facts:
