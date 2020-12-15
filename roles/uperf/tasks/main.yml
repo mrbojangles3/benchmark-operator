@@ -47,11 +47,9 @@
     msg: " key: {{ item.key }} "
   with_dict: "{{ node_list }}"
 
-- name: Node list debug ver2
+- name: Node list debug dustin
   debug:
-    msg: "{{ item.resources['metadata'] }}"
-  with_dict: "{{ node_list }}"
-  when: " 'resources' in item.key"
+    msg: "{{ node_list| json_query('resources[].metadata.name')}}"
 
 
 - name: Capture ServiceIP
