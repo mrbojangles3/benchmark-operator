@@ -40,12 +40,12 @@
   k8s_info:
     kind: Node
     api_version: v1
-  register: node_list
+# TODO figure out why this isn't working
+  register: "{{ node_list | json_query('resources[].metadata.name') }}"
 
-- name: Node list debug dustin
+- name: node_list debug
   debug:
-    msg: "{{ node_list| json_query('resources[].metadata.name') }}"
-    register: filtered_node_list
+    msg: "{{ node_list }}"
 
 - name: Node_list remove masters
   debug:
