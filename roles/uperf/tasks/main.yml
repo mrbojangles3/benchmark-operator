@@ -42,14 +42,16 @@
     api_version: v1
   register: node_list
 
-- name: Node_list print keys
-  debug:
-    msg: " key: {{ item.key }} "
-  with_dict: "{{ node_list }}"
-
 - name: Node list debug dustin
   debug:
-    msg: "{{ node_list| json_query('resources[].metadata.name')}}"
+    msg: "{{ node_list| json_query('resources[].metadata.name') }}"
+    register: filtered_node_list
+
+- name: Node_list remove masters
+  debug:
+    msg: "{{ item }}"
+  loop:  filtered_node_list
+  when: item contains "worker"
 
 
 - name: Capture ServiceIP
