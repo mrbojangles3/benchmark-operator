@@ -45,6 +45,7 @@
 - name: Trim list of Pods
   set_fact:
     node_name_list: "{{ node_list | json_query('resources[].metadata.name') | list }}"
+    cacheable: yes
 
 - name: node_list debug
   debug:
@@ -53,7 +54,7 @@
 - name: Node_list remove masters
   debug:
     msg: "{{ item }}"
-  loop:  "{{ query('ansible_facts.node_name_list', all) }}"
+  loop:  "{{ ansible_facts.node_name_list }}"
   when: '"worker" in item'
 
 
