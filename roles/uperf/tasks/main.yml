@@ -40,6 +40,10 @@
   k8s_info:
     kind: Node
     api_version: v1
+  register:
+    node_list: node_list
+
+- name: Trim list of Pods
   set_fact:
     node_name_list: "{{ node_list | json_query('resources[].metadata.name') }}"
 
