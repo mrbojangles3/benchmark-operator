@@ -51,6 +51,16 @@
   debug:
     msg: "{{ node_name_list }}"
 
+- name: Logan Loop Test
+  set_fact:
+    worker_node_list: "{{ worker_node_list + item }}"
+  loop: "{{ ansible_facts.node_name_list}}"
+  when: '"worker" in item'
+
+- name: worker_list debug
+  debug:
+    msg: "{{ worker_list }}"
+
 - name: Node_list remove masters
   debug:
     msg: "{{ item }}"
