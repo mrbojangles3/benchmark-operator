@@ -51,21 +51,17 @@
   debug:
     msg: "{{ node_name_list }}"
 
-- name: Logan Loop Test
+- name: Remove masters from list
   set_fact:
-    worker_node_list: "{{ worker_node_list + item }}"
+    worker_node_list: "{{ worker_node_list + [item] }}"
   loop: "{{ ansible_facts.node_name_list}}"
   when: '"worker" in item'
 
-- name: worker_list debug
+- name: worker_node_list debug
   debug:
-    msg: "{{ worker_list }}"
-
-- name: Node_list remove masters
-  debug:
-    msg: "{{ item }}"
-  loop:  "{{ ansible_facts.node_name_list }}"
-  when: '"worker" in item'
+    msg:
+      - "{{ worker_node_list }}"
+      - "{{ worker_node_list | length }}"
 
 
 - name: Capture ServiceIP
