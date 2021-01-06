@@ -37,7 +37,7 @@
   register: bo
 
 
-- name: List Worker Nodes
+- name: List Nodes Labeld as Workers
   k8s_info:
     api_version: v1
     kind: Node
@@ -47,7 +47,7 @@
   no_log: True
 
 
-- name: Isolate Worker Node Hostnames
+- name: Isolate Worker Role Hostnames
   set_fact:
     node_name_list: "{{ node_list | json_query('resources[].metadata.name') | list }}"
     cacheable: yes
