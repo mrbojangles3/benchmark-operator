@@ -7,7 +7,6 @@
     name: '{{ meta.name }}'
     namespace: '{{ operator_namespace }}'
   register: resource_state
-  no_log: True
 
 
 - operator_sdk.util.k8s_status:
@@ -19,7 +18,6 @@
       state: Building
       complete: false
   when: resource_state.resources[0].status.state is not defined
-  no_log: True
 
 - name: Get current state - If it has changed
   k8s_facts:
@@ -28,7 +26,6 @@
     name: '{{ meta.name }}'
     namespace: '{{ operator_namespace }}'
   register: resource_state
-  no_log: True
 
 - name: Capture operator information
   k8s_facts:
@@ -38,10 +35,9 @@
     label_selectors:
       - name = benchmark-operator
   register: bo
-  no_log: True
 
 
-- name: Logan get ROLE
+- name: List Worker Nodes
   k8s_info:
     api_version: v1
     kind: Node
@@ -51,20 +47,10 @@
   no_log: True
 
 
-- name: Trim list of Pods
+- name: Isolate Worker Node Hostnames
   set_fact:
     node_name_list: "{{ node_list | json_query('resources[].metadata.name') | list }}"
     cacheable: yes
-
-- name: Logan node_list debug
-  debug:
-    msg: "{{ node_name_list }}"
-
-    #- name: Remove masters from list
-    #  set_fact:
-    #    worker_node_list: "{{ worker_node_list + [item] }}"
-    #  loop: "{{ ansible_facts.node_name_list}}"
-    #  when: '"worker" in item'
 
 - name: Capture ServiceIP
   k8s_facts:
