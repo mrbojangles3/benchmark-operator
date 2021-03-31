@@ -5,7 +5,7 @@ a performance baseline of Kubernetes cluster on your provider.
 
 ## Installation
 
-Installing the benchmark-operator is easiest by using the helm chart and can be done with the following commands. This requires 
+Installing the benchmark-operator is easiest by using the helm chart and can be done with the following commands. This requires
 your machine to have Helm installed. [Install Helm](https://helm.sh/docs/intro/install/)
 
 > Note: If running on openshift you'll need to run this command before installing the chart. `oc adm policy -n my-ripsaw add-scc-to-user privileged -z benchmark-operator`
@@ -28,26 +28,27 @@ helm delete benchmark-operator -n my-ripsaw --purge
 
 ## Workloads status
 
-| Workload                       | Use                    | ElasticSearch indexing  | Reconciliation usage       | VM support (kubevirt) | Kata Containers |
-| ------------------------------ | ---------------------- | ------------------ | -------------------------- | --------------------- | --------------- |
-| [UPerf](docs/uperf.md)         | Network Performance    | Yes                |  Used, default : 3second  | Working                | Working         |
-| [Iperf3](docs/iperf.md)       | Network Performance     | No                 |  Used, default : 3second  | Not Supported          | Preview         |
-| [fio](docs/fio_distributed.md) | Storage IO             | Yes                |  Used, default : 3second  | Working                | Working         |
-| [Sysbench](docs/sysbench.md)   | System Performance     | No                 |  Used, default : 3second  | Not Supported          | Preview         |
-| [YCSB](docs/ycsb.md)           | Database Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         |
-| [Byowl](docs/byowl.md)         | User defined workload  | Yes            |  Used, default : 3second  | Not Supported          | Preview         |
-| [Pgbench](docs/pgbench.md)     | Postgres Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         |
-| [Smallfile](docs/smallfile.md) | Storage IO Performance | Yes            |  Used, default : 3second  | Not Supported          | Preview         |
-| [fs-drift](docs/fs-drift.md)   | Storage IO Longevity   | Yes            |  Not used                 | Not Supported          | Preview         |
-| [hammerdb](docs/hammerdb.md)   | Database Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         |
-| [Service Mesh](docs/servicemesh.md) | Microservices     | No            |  Used, default : 3second   | Not Supported         | Preview         |
-| [Vegeta](docs/vegeta.md)       | HTTP Performance       | Yes            |  Used, default : 3second  | Not Supported          | Preview         |
-| [Scale Openshift](docs/scale_openshift.md) | Scale Openshift Cluster       | Yes            |  Used, default : 3second  | Not Supported         | Preview        |
-| [stressng](docs/stressng.md)   | Stress system resources | Yes            |  Used, default: 3second  | Not Supported         | Preview        |
-| [kube-burner](docs/kube-burner.md)  | k8s Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         |
-| [cyclictest](docs/cyclictest.md)  | Real-Time Performance   | Yes       |  Used, default : 3second  | Not Supported          | Preview         |
-| [oslat](docs/oslat.md)         | Real-Time Latency      | Yes           |  Used, default : 3second   | Not Supported          | Preview         |
-
+| Workload                       | Use                    | ElasticSearch indexing  | Reconciliation usage       | VM support (kubevirt) | Kata Containers | CI Tested |
+| ------------------------------ | ---------------------- | ------------------ | -------------------------- | --------------------- | --------------- | ------------ |
+| [UPerf](docs/uperf.md)         | Network Performance    | Yes                |  Used, default : 3second  | Working                | Working         | Yes |
+| [Iperf3](docs/iperf.md)       | Network Performance     | No                 |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [fio](docs/fio_distributed.md) | Storage IO             | Yes                |  Used, default : 3second  | Working                | Working         | Yes |
+| [Sysbench](docs/sysbench.md)   | System Performance     | No                 |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [YCSB](docs/ycsb.md)           | Database Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [Byowl](docs/byowl.md)         | User defined workload  | Yes            |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [Pgbench](docs/pgbench.md)     | Postgres Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [Smallfile](docs/smallfile.md) | Storage IO Performance | Yes            |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [fs-drift](docs/fs-drift.md)   | Storage IO Longevity   | Yes            |  Not used                 | Not Supported          | Preview         | Yes |
+| [hammerdb](docs/hammerdb.md)   | Database Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [Service Mesh](docs/servicemesh.md) | Microservices     | No            |  Used, default : 3second   | Not Supported         | Preview         | No |
+| [Vegeta](docs/vegeta.md)       | HTTP Performance       | Yes            |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [Scale Openshift](docs/scale_openshift.md) | Scale Openshift Cluster       | Yes            |  Used, default : 3second  | Not Supported         | Preview        | Yes |
+| [stressng](docs/stressng.md)   | Stress system resources | Yes            |  Used, default: 3second  | Working               | Preview        | Yes |
+| [kube-burner](docs/kube-burner.md)  | k8s Performance   | Yes            |  Used, default : 3second  | Not Supported          | Preview         | Yes |
+| [cyclictest](docs/cyclictest.md)  | Real-Time Performance   | Yes       |  Used, default : 3second  | Not Supported          | Preview         | No |
+| [oslat](docs/oslat.md)         | Real-Time Latency      | Yes           |  Used, default : 3second   | Not Supported          | Preview         | No |
+| [testpmd](docs/testpmd.md)         | TestPMD DPDK App      | No           |  Used   | Not Supported          | Preview         | No |
+| [Flent](docs/flent.md)         | Network Performance    | Yes           |  Used, default : 3second  | Not Supported          | Not Supported   | Yes |
 
 ### Reconciliation
 
@@ -84,6 +85,32 @@ spec:
       image: my.location/foo:latest
 ```
 
+## Optional debug out for benchmark-wrapper workloads
+Workloads that are triggered through [benchmark-wrapper](https://github.com/cloud-bulldozer/benchmark-wrapper)
+can optionally pass the debug flag through the workload CR.
+
+NOTE: This is not a required arguement. If omitted it will default to the default logging level of 
+the benchmark-wrapper
+
+For Example:
+
+```
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: example-benchmark
+  namespace: my-ripsaw
+spec:
+  elasticsearch:
+    url: "http://my-es.foo.bar:80"
+  metadata_collection: true
+  cleanup: false
+  workload:
+    name: snafu_workload
+    args:
+      debug: true
+```
+
 ## User Provided UUID
 All benchmarks in the benchmark-operator utilize a UUID for tracking and indexing purposes. This UUID is,
 by default, generated when the workload is first started. However, if desired, a user provided UUID can
@@ -114,7 +141,7 @@ spec:
 [Installation](docs/installation.md)
 
 ## Contributing
-[Contributing](CONTRIBUTE.md)
+[Contributing](CONTRIBUTING.md)
 
 ## Metadata Collection
 [Metadata Collection](docs/metadata.md)

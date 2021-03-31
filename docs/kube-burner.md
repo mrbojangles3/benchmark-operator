@@ -14,11 +14,11 @@
 ## What is kube-burner?
 
 Kube-burner is a tool that allows a user to perform scalability tests across Kubernetes and OpenShift clusters by creating thousands of objects. Kube-burner is developed in it's own repository at https://github.com/cloud-bulldozer/kube-burner
-The ripsaw integration here is meant to run only some workloads useful to measure certain performance KPIs of a cluster.
+The benchmark-operator integration here is meant to run only some workloads useful to measure certain performance KPIs of a cluster.
 
 ## Running kube-burner
 
-Given that you followed instructions to deploy operator. Kube-burner needs an additional serviceaccount and clusterrole to run. Available at [kube-burner-role.yml](../resources/kube-burner-role.yml)
+Given that you followed instructions to deploy benchmark-operator. Kube-burner needs an additional serviceaccount and clusterrole to run. Available at [kube-burner-role.yml](../resources/kube-burner-role.yml)
 You can modify kube-burner's [cr.yaml](../resources/crds/ripsaw_v1alpha1_kube-burner_cr.yaml) to fit your requirements.
 
 ----
@@ -39,11 +39,11 @@ Each iteration of this workload creates the following objects:
   - 10 secrets
   - 10 configmaps
 
-- **kubelet-density**: Creates a single namespace with a number of Deployments equal to **job_iterations**.
+- **node-density**: Creates a single namespace with a number of Deployments equal to **job_iterations**.
 Each iteration of this workload creates the following object:
   - 1 pod. (sleep)
 
-- **kubelet-density-heavy**. Creates a **single namespace with a number of applications equals to job_iterations**. This application consists on two deployments (a postgresql database and a simple client that generates some CPU load) and a service that is used by the client to reach the database.
+- **node-density-heavy**. Creates a **single namespace with a number of applications equals to job_iterations**. This application consists on two deployments (a postgresql database and a simple client that generates some CPU load) and a service that is used by the client to reach the database.
 Each iteration of this workload creates the following objects:
   - 1 deployment holding a postgresql database
   - 1 deployment holding a client application for the previous database
@@ -59,14 +59,18 @@ Each iteration of this workload creates the following objects:
   - 1 simple application deployment (hello-openshift)
   - 1 service pointing to the previous deployment
 
+- **pod-density**: Creates a single namespace with a number of Deployments equal to **job_iterations**. This workload is similar to node-density except is used to create a large number of pods spread across the cluster instead of specifically loading up each node with a given number of pods as in `node-density`.
+Each iteration of this workload creates the following object:
+  - 1 pod. (sleep)
+
 The workload type is specified by the parameter `workload` from the `args` object of the configuration. Each workload supports several configuration parameters, detailed in the [configuration section](#configuration)
 
 ## Configuration
 
 All kube-burner's workloads support the following parameters:
 
-- **`workload`**: Type of kube-burner workload. As mentioned before, allowed values are cluster-density, kubelet-density and kubelet-density-heavy
-- **``default_index``**: Elasticsearch index name. Defaults to __ripsaw-kube-burner__
+- **`workload`**: Type of kube-burner workload. As mentioned before, allowed values are cluster-density, node-density and node-density-heavy
+- **``default_index``**: ElasticSearch index name. Defaults to __ripsaw-kube-burner__
 - **``job_iterations``**: How many iterations to execute of the specified kube-burner workload
 - **``qps``**: Limit object creation queries per second. Defaults to __5__
 - **``burst``**: Maximum burst for throttle. Defaults to __10__
@@ -90,10 +94,10 @@ Where key defaults to __node-role.kubernetes.io/worker__ and value defaults to e
 - **``job_timeout``**: Kube-burner job timeout in seconds. Defaults to __3600__ .Uses the parameter [activeDeadlineSeconds](https://kubernetes.io/docs/concepts/workloads/controllers/job/#job-termination-and-cleanup)
 - **``pin_server``** and **``tolerations``**: Detailed in the section [Pin to server and tolerations](#Pin-to-server-and-tolerations)
 - **``step``**: Prometheus step size, useful for long benchmarks. Defaults to 30s
-- **``metrics_profile``**: kube-burner metric profile that indicates what prometheus metrics kube-burner will collect. Defaults to `metrics.yaml` in kubelet-density workloads and `metrics-aggregated.yaml` in the remaining. Detailed in the [Metrics section](#Metrics) of this document
+- **``metrics_profile``**: kube-burner metric profile that indicates what prometheus metrics kube-burner will collect. Defaults to `metrics.yaml` in node-density workloads and `metrics-aggregated.yaml` in the remaining. Detailed in the [Metrics section](#Metrics) of this document
 - **``runtime_class``** : If this is set, the benchmark-operator will apply the runtime_class to the podSpec runtimeClassName.
 
-kube-burner is able to collect complex prometheus metrics and index them in a ElasticSearch instance. This feature can be configured by the prometheus object of kube-burner's CR.
+kube-burner is able to collect complex prometheus metrics and index them in a ElasticSearch. This feature can be configured by the prometheus object of kube-burner's CR.
 
 ```yaml
 spec:
@@ -109,7 +113,7 @@ Where:
 - **``prom_url``**: Points to a valid Prometheus endpoint. Full URL format required. i.e https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
 - **``prom_token``**: Refers to a valid prometheus token. It can be obtained with: `oc -n openshift-monitoring sa get-token prometheus-k8s`
 
-**Note**: It's possible to index documents in an authenticated ES instance using the notation `http(s)://[username]:[password]@[address]:[port]` in the es_url parameter.
+**Note**: It's possible to index documents in an authenticated ES endpoint using the notation `http(s)://[username]:[password]@[address]:[port]` in the es_url parameter.
 
 ## Metrics
 
@@ -118,7 +122,7 @@ kube-burner is able to collect Prometheus metrics using the time range of the be
 - [metrics.yaml](../roles/kube-burner/files/metrics.yaml): This metric profile is indicated for benchmarks executed in small clusters. Since it gets metrics for several system pods from each node. Otherwise, we can reduce the number of indexed metrics (at the expense of granularity) with the parameter **step**.
 - [metrics-aggregated.yaml](../roles/kube-burner/files/metrics-aggregated.yaml): This metric profile is indicated for benchmarks in large clusters. Since the metrics from the worker nodes and the infra nodes are aggregated and only metrics from master nodes are collected individually. Also the parameter **step** can be used to reduce the number of metrics (at the expense of granularity) that will be indexed.
 
-By default the [metrics.yaml](../roles/kube-burner/files/metrics-aggregated.yaml) profile is used  in kubelet-density workloads and `metrics-aggregated.yaml` in the remaining. You can change this profile with the variable **metrics_profile**.
+By default the [metrics.yaml](../roles/kube-burner/files/metrics-aggregated.yaml) profile is used  in node-density workloads and `metrics-aggregated.yaml` in the remaining. You can change this profile with the variable **metrics_profile**.
 
 **Note**: Metrics collection and indexing is enabled when setting prometheus `prom_url`
 
@@ -129,7 +133,7 @@ It's possible to pin kube-burner pod to a certain node using the `pin_server` pa
 ```jinja
 {% if workload_args.pin_server is defined %}
 {% for label, value in  workload_args.pin_server.items() %}
-        {{ label | replace ("_", "-" )}}: {{ value }}
+      {{ label | replace ("_", "-" )}}: {{ value }}
 {% endfor %}
 {% else %}
       node-role.kubernetes.io/worker: ""
@@ -158,7 +162,7 @@ workload:
 
 ## Using a remote configuration for kube-burner
 
-Apart from the pre-defined workloads available in this integration with kube-burner, it's possible to make kube-burner to fetch a remote configuration file, from 
+Apart from the pre-defined workloads available in `benchmark-operator`. it's possible to make kube-burner to fetch a remote configuration file, from
 a remote http server. This mechanism can be used by pointing the variable `remote_config` to the desired remote configuration file:
 
 
@@ -171,10 +175,23 @@ workload:
 Keep in mind that the object templated declared in this remote configuration file need to be pointed to a remote source as well so that kube-burner will also be able to fetch them. i.e
 ```yaml
     objects:
-
-      - objectTemplate: https://your.domain.org/templates/pod.yml
-        replicas: 1
+    - objectTemplate: https://your.domain.org/templates/pod.yml
+      replicas: 1
 ```
+
+> `kube-burner` is able to use go template based configuration files, in addition to the default behaviour, this template can reference environment variables using the syntax `{{ .MY_ENV_VAR }}`. The kube-burner job created by `benchmark-operator` always injects the environment variable `prom_es` with the value of `prometheus.es_url`. This can be useful to overwrite the ElasticSearch URL in remote configuration files as shown in the code snippet below.
+
+```yaml
+global:
+  writeToFile: false
+  indexerConfig:
+    enabled: true
+    esServers: ["{{.prom_es}}"]
+    insecureSkipVerify: true
+    defaultIndex: ripsaw-kube-burner
+    type: elastic
+```
+
 
 In addition to using remote configurations for kube-burner, it's also possible to use a remote metrics profile. It can be configured with the variable `remote_metrics_profile`
 
@@ -200,7 +217,7 @@ And this file looks like:
 # etcd alarms
 
 - expr: avg_over_time(histogram_quantile(0.99, rate(etcd_disk_wal_fsync_duration_seconds_bucket[2m]))[5m:]) > 0.015
-  description: 5 minutes avg. etcd fsync latency on {{$labels.pod}} higher than 10ms {{$value}}
+  description: 5 minutes avg. etcd fsync latency on {{$labels.pod}} higher than 15ms {{$value}}
   severity: error
 
 - expr: avg_over_time(histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket[5m]))[5m:]) > 0.1

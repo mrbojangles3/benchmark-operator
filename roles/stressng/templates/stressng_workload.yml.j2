@@ -60,6 +60,8 @@ spec:
             value: "{{ elasticsearch.index_name | default("ripsaw-stressng") }}"
           - name: parallel
             value: "{{ elasticsearch.parallel | default(false) }}"
+          - name: es_verify_cert
+            value: "{{ elasticsearch.verify_cert | default(true) }}"
 {% endif %}
 {% if prometheus is defined %}
           - name: prom_es
@@ -72,7 +74,12 @@ spec:
             value: "{{ prometheus.prom_url | default() }}"
 {% endif %}
         command: ["/bin/sh", "-c"]
-        args: ["run_snafu --tool stressng -j /workload/jobfile -u {{ uuid }}"]
+        args: 
+          - run_snafu --tool stressng -j /workload/jobfile -u {{ uuid }}
+{% if workload_args.debug is defined and workload_args.debug %}
+            -v
+{% endif %}
+            ;
         volumeMounts:
         - name: stressng-workload-volume
           mountPath: "/workload"
@@ -84,3 +91,4 @@ spec:
           defaultMode: 0660
       restartPolicy: OnFailure
 {% include "metadata.yml.j2" %}
+

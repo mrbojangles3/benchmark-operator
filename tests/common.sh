@@ -27,6 +27,7 @@ function populate_test_list {
     if [[ $(echo ${item} | grep 'roles/stressng') ]]; then echo "test_stressng.sh" >> tests/iterate_tests; fi
     if [[ $(echo ${item} | grep 'roles/scale_openshift') ]]; then echo "test_scale_openshift.sh" >> tests/iterate_tests; fi
     if [[ $(echo ${item} | grep 'roles/kube-burner') ]]; then echo "test_kubeburner.sh" >> tests/iterate_tests; fi
+    if [[ $(echo ${item} | grep 'roles/flent') ]]; then echo "test_flent.sh" >> tests/iterate_tests; fi
 
 
     # Check for changes in cr files
@@ -45,6 +46,7 @@ function populate_test_list {
     if [[ $(echo ${item} | grep 'valid_stressng*') ]]; then echo "test_stressng.sh" >> tests/iterate_tests; fi
     if [[ $(echo ${item} | grep 'valid_scale*') ]]; then echo "test_scale_openshift.sh" >> tests/iterate_tests; fi
     if [[ $(echo ${item} | grep 'valid_kube-burner*') ]]; then echo "test_kubeburner.sh" >> tests/iterate_tests; fi
+    if [[ $(echo ${item} | grep 'valid_flent*') ]]; then echo "test_flent.sh" >> tests/iterate_tests; fi
 
 
     # Check for changes in test scripts
@@ -59,6 +61,7 @@ function wait_clean {
   then
     kubectl delete benchmarks -n my-ripsaw --all --ignore-not-found
   fi
+  kubectl delete -f deploy/25_role.yaml -f deploy/35_role_binding.yaml --ignore-not-found
   kubectl delete namespace my-ripsaw --ignore-not-found
 }
 
